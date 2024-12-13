@@ -1,17 +1,21 @@
+from cell_state import CellState
+
 class Cell():
-    def __init__(self, col, row, state):
-      self.col = col
-      self.row = row
+    def __init__(self, value):
+      self.state = CellState.UNOPENED
+      self.value = value
+
+    def __eq__(self, otherCell):
+      return (self.state == otherCell.state and self.value == otherCell.value)
+    
+    def getState(self):
+      return self.state
+    
+    def setState(self, state):
       self.state = state
-
-    def _create_board(self):
-      board = []  
-      for i in range(0, self.num_rows):
-        row = [] 
-        for j in range(0, self.num_cols):
-          row.append(0)
     
-      board.append(row)
-      return board
-
+    def getValue(self):
+      return self.state
     
+    def setValue(self, value):
+      self.value = value

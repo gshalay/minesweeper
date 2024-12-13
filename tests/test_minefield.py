@@ -1,6 +1,6 @@
 import unittest
 
-from minefield import Minefield
+from src.minefield import Minefield
 
 class TestMinefield(unittest.TestCase):
     def test_init(self):
