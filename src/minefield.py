@@ -31,16 +31,12 @@ class Minefield():
       self.num_cols = num_cols
       self.num_rows = num_rows
       self.num_mines = num_mines
-      self.size = num_cols * num_rows
       self.board = self._create_board()
-      print(self)
-      print()
       self.place_mines()
-      print(self)
-      print()
       self.place_adjacencies()
+      self.obfuscated_board = self._obfuscate_board()
+      
       print(self)
-      print()
 
     def place_mines(self):
       placed_mines = 0
@@ -110,16 +106,96 @@ class Minefield():
     def _create_board(self):
       return np.array([[Cell() for _ in range(self.num_cols)] for _ in range(self.num_rows)], dtype=Cell)
     
+    def open_coord(self, i, j):
+      self.board[i, j].state = CellState.OPENED
+      
+      if(self.board[i, j] == BLANK_VAL):
+        self.reveal_adjacent_blank_cells(i, j)
+        return BLANK_VAL
+      else:
+        return self.board[i, j].value      
+    
+    def bounds_in_range(self, i, j):
+      return i in range(self.num_rows) and j in range(self.num_cols)
+  
+    def reveal_adjacent_blank_cells(self, i, j):
+      ## Top Row
+      # Top Left
+      if(self.bounds_in_range(i - 1, j - 1) and self.board[i - 1, j - 1].state == CellState.UNOPENED):
+        self.board[i - 1, j - 1].state = CellState.OPENED
+        if(self.board[i - 1, j - 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i - 1, j - 1)
+        
+      # Top Middle
+      if(self.bounds_in_range(i, j - 1) and self.board[i, j - 1].state == CellState.UNOPENED):
+        self.board[i, j - 1].state = CellState.OPENED
+        if(self.board[i, j - 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i, j - 1)
+        
+      # Top Right
+      if(self.bounds_in_range(i + 1, j - 1) and self.board[i + 1, j - 1].state == CellState.UNOPENED):
+        self.board[i + 1, j - 1].state = CellState.OPENED
+        if(self.board[i + 1, j - 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i + 1, j - 1)
+        
+      ## Middle Row
+      # Middle Left
+      if(self.bounds_in_range(i - 1, j) and self.board[i - 1, j].state == CellState.UNOPENED):
+        self.board[i - 1, j].state = CellState.OPENED
+        if(self.board[i - 1, j].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i - 1, j)
+      
+      # Middle Right
+      if(self.bounds_in_range(i + 1, j) and self.board[i + 1, j].state == CellState.UNOPENED):
+        self.board[i + 1, j].state = CellState.OPENED
+        if(self.board[i + 1, j].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i + 1, j)
+        
+      ## Bottom Row  
+      # Bottom Left
+      if(self.bounds_in_range(i - 1, j + 1) and self.board[i - 1, j + 1].state == CellState.UNOPENED):
+        self.board[i - 1, j + 1].state = CellState.OPENED
+        if(self.board[i - 1, j + 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i - 1, j + 1)
+        
+      # Bottom Middle
+      if(self.bounds_in_range(i, j + 1) and self.board[i, j + 1].state == CellState.UNOPENED):
+        self.board[i, j + 1].state = CellState.OPENED
+        if(self.board[i, j + 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i, j + 1)
+        
+      # Bottom Right
+      if(self.bounds_in_range(i + 1, j + 1) and self.board[i + 1, j + 1].state == CellState.UNOPENED):
+        self.board[i + 1, j + 1].state = CellState.OPENED
+        if(self.board[i + 1, j + 1].value == BLANK_VAL):
+          self.reveal_adjacent_blank_cells(i + 1, j + 1)
+    
+    def _obfuscate_board(self):
+      return np.array([[" " for _ in range(self.num_cols)] for _ in range(self.num_rows)], dtype=str)
+      
     def __str__(self):
       rep = "[\n"
       
       for i in range(0, self.num_rows):
         rep += "\t["
         for j in range(0, self.num_cols):
-          rep += str(self.board[i][j].value)
+          rep += str(self.board[i][j].value).rjust(2, " ")
 
           if(j < self.num_cols - 1):
             rep += ", "
+
+        rep += "]\n"
+
+      rep += "]\n\n"
+      rep += "[\n"
+      
+      for i in range(0, self.num_rows):
+        rep += "\t["
+        for j in range(0, self.num_cols):
+          rep += " "
+
+          if(j < self.num_cols - 1):
+            rep += "|"
 
         rep += "]\n"
 
