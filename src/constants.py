@@ -2,6 +2,12 @@
 FLAGGED_VAL = -1
 MINE_VAL = -2
 BLANK_VAL = 0
+MAX_DIM = 50
+MAX_MINE_PERCENTAGE = 0.25 # Up to 25% of the board can be mines.
+MOVE_ARG_LEN = 3
+MOVE_TYPE_VALS = [ "f", "flag", "o", "open" ]
+FLAG_MOVE_TYPE_VALS = [ "f", "flag" ] 
+OPEN_MOVE_TYPE_VALS = [ "o", "open" ]
 
 ## Difficulty Dims
 # EASY (9 x 9) board with 10 mines.

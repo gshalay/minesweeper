@@ -7,23 +7,23 @@ from cell_state import CellState
 from cell import Cell
 
 class Minefield():
-    def __init__(self, difficulty):
+    def __init__(self, difficulty, num_rows=None, num_cols=None, num_mines=None):
       match(difficulty):
         case Difficulty.EASY:
-          self.init(EASY_COLS, EASY_ROWS, EASY_NUM_MINES)
+          self.init(EASY_ROWS, EASY_COLS, EASY_NUM_MINES)
           return
         case Difficulty.MEDIUM:
-          self.init(MED_COLS, MED_ROWS, MED_NUM_MINES)
+          self.init(MED_ROWS, MED_COLS, MED_NUM_MINES)
           return
         case Difficulty.HARD:
-          self.init(HARD_COLS, HARD_ROWS, HARD_NUM_MINES)
+          self.init(HARD_ROWS, HARD_COLS, HARD_NUM_MINES)
           return
         case Difficulty.EXTREME:
-          self.init(EXP_COLS, EXP_ROWS, EXP_NUM_MINES)
+          self.init(EXP_ROWS, EXP_COLS, EXP_NUM_MINES)
           return
         case Difficulty.CUSTOM:
-          print("Custom mode not yet supported.")
-          return NotImplementedError
+          self.init(num_rows, num_cols, num_mines)
+          return
         case _:
           raise Exception("Unknown difficulty.")
           
@@ -35,8 +35,6 @@ class Minefield():
       self.place_mines()
       self.place_adjacencies()
       self.obfuscated_board = self._obfuscate_board()
-      
-      print(self)
 
     def place_mines(self):
       placed_mines = 0
@@ -106,6 +104,29 @@ class Minefield():
     def _create_board(self):
       return np.array([[Cell() for _ in range(self.num_cols)] for _ in range(self.num_rows)], dtype=Cell)
     
+    def flag_coord(self, i, j):
+      if(self.bounds_in_range(i, j) and self.board[i, j].state != CellState.OPENED):
+        if(self.board[i, j].state == CellState.FLAGGED):
+          return False
+
+        self.board[i, j].state = CellState.FLAGGED
+        return True
+      else:
+        return False
+
+    def count_unopened_cells(self):
+      ((25 < self.board) & (self.board < 100)).sum()
+
+    def is_solved(self):
+      cell_states = np.array([[cell.state for cell in row] for row in self.board])
+
+      # Create a mask where CellState is not unopened
+      mask = cell_states != CellState.UNOPENED
+
+      # Count elements that are not unopened
+      return (np.sum(mask) == self.num_mines)
+
+
     def open_coord(self, i, j):
       self.board[i, j].state = CellState.OPENED
       
