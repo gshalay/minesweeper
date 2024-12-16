@@ -51,9 +51,6 @@ class Minefield():
             mine_placed = True
             placed_mines += 1
     
-    def is_mine(self, i, j):
-      return (self.board[i][j].value == MINE_VAL) 
-    
     def count_adjacent_mines(self, i, j):
       # Total of 8 possible locations for a mine to be for each cell.
       adjacent_mines = 0
@@ -193,27 +190,40 @@ class Minefield():
     
     def _obfuscate_board(self):
       return np.array([[" " for _ in range(self.num_cols)] for _ in range(self.num_rows)], dtype=str)
-      
+    
+    def get_obfuscated_char(self, i, j):
+      match(self.board[i, j].state):
+        case CellState.UNOPENED:
+          return UNOPENED_CHAR
+        case CellState.FLAGGED:
+          return FLAGGED_CHAR
+        case CellState.OPENED:
+          if(self.board[i, j].is_mine()):
+            return MINE_CHAR
+        case _:
+          return str(self.board[i, j].value)
+
     def __str__(self):
       rep = "[\n"
       
-      for i in range(0, self.num_rows):
-        rep += "\t["
-        for j in range(0, self.num_cols):
-          rep += str(self.board[i][j].value).rjust(2, " ")
+      # Solution representation.
+      # for i in range(0, self.num_rows):
+      #   rep += "\t["
+      #   for j in range(0, self.num_cols):
+      #     rep += str(self.board[i][j].value).rjust(2, " ")
 
-          if(j < self.num_cols - 1):
-            rep += ", "
+      #     if(j < self.num_cols - 1):
+      #       rep += ", "
 
-        rep += "]\n"
+      #   rep += "]\n"
 
-      rep += "]\n\n"
-      rep += "[\n"
+      # rep += "]\n\n"
+      # rep += "[\n"
       
       for i in range(0, self.num_rows):
         rep += "\t["
         for j in range(0, self.num_cols):
-          rep += " "
+          rep += self.get_obfuscated_char(i, j)
 
           if(j < self.num_cols - 1):
             rep += "|"

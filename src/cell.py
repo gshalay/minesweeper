@@ -7,6 +7,6 @@ class Cell():
 
     def __init__(self):
       return
-
-    def __eq__(self, otherCell):
-      return (self.state == otherCell.state and self.value == otherCell.value)
+      
+    def is_mine(self):
+      return self.value == MINE_VAL

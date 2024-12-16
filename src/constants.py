@@ -8,6 +8,9 @@ MOVE_ARG_LEN = 3
 MOVE_TYPE_VALS = [ "f", "flag", "o", "open" ]
 FLAG_MOVE_TYPE_VALS = [ "f", "flag" ] 
 OPEN_MOVE_TYPE_VALS = [ "o", "open" ]
+UNOPENED_CHAR = "U"
+FLAGGED_CHAR = "F"
+MINE_CHAR = "M"
 
 ## Difficulty Dims
 # EASY (9 x 9) board with 10 mines.

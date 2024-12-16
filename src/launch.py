@@ -50,14 +50,14 @@ def get_custom_minefield():
 
     return Minefield(Difficulty.CUSTOM, num_rows, num_cols, num_mines)
     
-def get_cli_game_info():
+def get_minefield_cli():
     print("-------------------- MINESWEEPER GAME SETUP --------------------")
     print("SELECT DIFFICULTY:")
-    print("1. EASY   (9x9) with 10 mines")
-    print("2. MEDIUM (16x16) with 40 mines")
-    print("3. HARD   (22x22) with 60 mines")
-    print("4. EXPERT (30x16) with 99 mines")
-    print("5. CUSTOM (custom board size and mine count)")
+    print("1. EASY    (9x9) with 10 mines")
+    print("2. MEDIUM  (16x16) with 40 mines")
+    print("3. HARD    (22x22) with 60 mines")
+    print("4. EXTREME (30x16) with 99 mines")
+    print("5. CUSTOM  (custom board size and mine count)")
     print("----------------------------------------------------------------")
 
     while True:
@@ -69,8 +69,8 @@ def get_cli_game_info():
                 return Minefield(Difficulty.MEDIUM)
             case "3" | "3." | "hard":
                 return Minefield(Difficulty.HARD)
-            case "4" | "4." | "expert":
-                return Minefield(Difficulty.EXPERT)
+            case "4" | "4." | "extreme":
+                return Minefield(Difficulty.EXTREME)
             case "5" | "5." | "custom":
                 return get_custom_minefield()
             case _:
@@ -80,8 +80,10 @@ def get_cli_game_info():
 
 def do_game_loop(minefield):
     while not minefield.is_solved():
+        print(minefield)
         print("Type your move in the following format (without less or greater than symbols): <f (for flag) or o (for open)> <row> <column>")
-        print("Note: The first row is 0 and the last row is the number of total rows - 1. The same is true for columns.")
+        print("Note: Unopened cells = U, Flagged cells = F (can still be opened), Blank or number are opened cells, and and M = a mine.")
+        print("Note 2: The first row is 0 and the last row is the number of total rows - 1. The same is true for columns.")
         selection = input("Enter move: ").strip().lower().split()
 
         if(len(selection) != MOVE_ARG_LEN or 
@@ -98,17 +100,19 @@ def do_game_loop(minefield):
         # Flag move
         if(selection[0] in FLAG_MOVE_TYPE_VALS):
             if(minefield.flag_coord(row, col)):
-                continue
+                print(f"Flagged cell at row {row} and column {col}.")
+                
             else:
                 print(f"Couldn't flag cell {row}, {col}. It is either already flagged or already open.")
-                time.sleep(1)
+            
+            time.sleep(1)
 
         # Open move
         elif(selection[0] in OPEN_MOVE_TYPE_VALS):
-            if(minefield.flag_coord(row, col) == MINE_VAL):
+            if(minefield.open_coord(row, col) == MINE_VAL):
                 # Game Over!
                 return False
-            elif(minefield.flag_coord(row, col) != MINE_VAL):
+            elif(minefield.open_coord(row, col) != MINE_VAL):
                 continue
             else:
                 print(f"Couldn't flag cell {row}, {col}. It is either already flagged or already open.")
@@ -117,14 +121,13 @@ def do_game_loop(minefield):
     # Minefield solved. Congrats!
     return True
 
-
-
-        
-
-
-
 def launch_cli():
-    minefield = get_cli_game_info()
+    field_solved = do_game_loop(get_minefield_cli())
+
+    if(field_solved):
+        print("Minefield solved! Congrats!")
+    else:
+        print("KABOOM! Mine triggered! GAME OVER!")
 
 def launch_ui():
     field = Minefield(Difficulty.EASY)
