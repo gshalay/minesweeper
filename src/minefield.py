@@ -35,7 +35,6 @@ class Minefield():
       self.place_mines()
       self.place_adjacencies()
       self.obfuscated_board = self._obfuscate_board()
-      print(self.print_solution())
 
     def place_mines(self):
       placed_mines = 0

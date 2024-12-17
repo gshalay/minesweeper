@@ -1,25 +1,37 @@
 import unittest
+import sys
+import os
 
-from src.cell import Cell
+# Add src to path.
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
+from cell import Cell
 from cell_state import CellState
+from constants import *
 
 class TestMinefield(unittest.TestCase):
     def test_init(self):
-        cell1 = Cell(1, 6, CellState.OPENED)
-        cell2 = Cell(2, 3, CellState.UNOPENED)
-        cell3 = Cell(4, 5, CellState.FLAGGED)
+        cell1 = Cell()
+        self.assertEqual(cell1.state, CellState.UNOPENED)
+        self.assertEqual(cell1.value, BLANK_VAL)
         
-        self.assertEqual(cell1.col, 1)
-        self.assertEqual(cell1.row, 6)
-        self.assertEqual(cell1.state, CellState.OPENED)
+    def test_is_mine(self):
+        actual1 = Cell()
+        actual2 = Cell()
         
-        self.assertEqual(cell2.col, 2)
-        self.assertEqual(cell2.row, 3)
-        self.assertEqual(cell2.state, CellState.UNOPENED)
+        actual2.value = MINE_VAL
         
-        self.assertEqual(cell3.col, 2)
-        self.assertEqual(cell3.row, 3)
-        self.assertEqual(cell3.state, CellState.FLAGGED)
+        self.assertTrue(actual1.is_mine())
+        self.assertFalse(actual2.is_mine())
+
+    def test_is_mine(self):
+        actual1 = Cell()
+        actual2 = Cell()
+        
+        actual2.value = MINE_VAL
+        
+        self.assertTrue(actual1.is_blank())
+        self.assertFalse(actual2.is_blank())
         
 
 if(__name__ == "__main__"):
