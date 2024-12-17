@@ -11,6 +11,7 @@ OPEN_MOVE_TYPE_VALS = [ "o", "open" ]
 UNOPENED_CHAR = "U"
 FLAGGED_CHAR = "F"
 MINE_CHAR = "M"
+BLANK_CHAR = " "
 
 ## Difficulty Dims
 # EASY (9 x 9) board with 10 mines.

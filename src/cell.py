@@ -10,3 +10,6 @@ class Cell():
       
     def is_mine(self):
       return self.value == MINE_VAL
+    
+    def is_blank(self):
+      return self.value == 0

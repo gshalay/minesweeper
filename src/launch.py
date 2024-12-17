@@ -110,6 +110,7 @@ def do_game_loop(minefield):
         # Open move
         elif(selection[0] in OPEN_MOVE_TYPE_VALS):
             if(minefield.open_coord(row, col) == MINE_VAL):
+                print(minefield)
                 # Game Over!
                 return False
             elif(minefield.open_coord(row, col) != MINE_VAL):

@@ -35,6 +35,7 @@ class Minefield():
       self.place_mines()
       self.place_adjacencies()
       self.obfuscated_board = self._obfuscate_board()
+      print(self.print_solution())
 
     def place_mines(self):
       placed_mines = 0
@@ -57,37 +58,37 @@ class Minefield():
       
       ## Top Row
       # Top Left
-      if(i - 1 >= 0 and j - 1 >= 0 and self.is_mine(i - 1, j - 1)):
+      if(i - 1 >= 0 and j - 1 >= 0 and self.board[i - 1, j - 1].is_mine()):
         adjacent_mines += 1
         
       # Top Middle
-      if(i in range(0, self.num_rows) and j - 1 in range(0, self.num_cols) and self.is_mine(i, j - 1)):
+      if(i in range(0, self.num_rows) and j - 1 in range(0, self.num_cols) and self.board[i, j - 1].is_mine()):
         adjacent_mines += 1
         
       # Top Right
-      if(i + 1 in range(0, self.num_rows) and j - 1 in range(0, self.num_cols) and self.is_mine(i + 1, j - 1)):
+      if(i + 1 in range(0, self.num_rows) and j - 1 in range(0, self.num_cols) and self.board[i + 1, j - 1].is_mine()):
         adjacent_mines += 1
         
       ## Middle Row
       # Middle Left
-      if(i - 1 in range(0, self.num_rows) and j in range(0, self.num_cols) and self.is_mine(i - 1, j)):
+      if(i - 1 in range(0, self.num_rows) and j in range(0, self.num_cols) and self.board[i - 1, j].is_mine()):
         adjacent_mines += 1
       
       # Middle Right
-      if(i + 1 in range(0, self.num_rows) and j in range(0, self.num_cols) and self.is_mine(i + 1, j)):
+      if(i + 1 in range(0, self.num_rows) and j in range(0, self.num_cols) and self.board[i + 1, j].is_mine()):
         adjacent_mines += 1
         
       ## Bottom Row  
       # Bottom Left
-      if(i - 1 in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.is_mine(i - 1, j + 1)):
+      if(i - 1 in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.board[i - 1, j + 1].is_mine()):
         adjacent_mines += 1
         
       # Bottom Middle
-      if(i in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.is_mine(i, j + 1)):
+      if(i in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.board[i, j + 1].is_mine()):
         adjacent_mines += 1
         
       # Bottom Right
-      if(i + 1 in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.is_mine(i + 1, j + 1)):
+      if(i + 1 in range(0, self.num_rows) and j + 1 in range(0, self.num_cols) and self.board[i + 1, j + 1].is_mine()):
         adjacent_mines += 1
       
       return adjacent_mines
@@ -115,10 +116,18 @@ class Minefield():
       ((25 < self.board) & (self.board < 100)).sum()
 
     def is_solved(self):
-      cell_states = np.array([[cell.state for cell in row] for row in self.board])
+      cell_states = np.array([[cell.state for cell in row] for row in self.board]).flatten()
 
       # Create a mask where CellState is not unopened
-      mask = cell_states != CellState.UNOPENED
+      mask = cell_states != CellState.OPENED
+      s = np.sum(mask)
+
+      if(np.sum(mask) == self.num_mines):
+        print(mask)
+        print()
+        print(cell_states)
+        print()
+        print(f"sum: {s}\tmines: {self.num_mines}")
 
       # Count elements that are not unopened
       return (np.sum(mask) == self.num_mines)
@@ -127,11 +136,11 @@ class Minefield():
     def open_coord(self, i, j):
       self.board[i, j].state = CellState.OPENED
       
-      if(self.board[i, j] == BLANK_VAL):
+      if(self.board[i, j].value == BLANK_VAL):
         self.reveal_adjacent_blank_cells(i, j)
         return BLANK_VAL
       else:
-        return self.board[i, j].value      
+        return self.board[i, j].value
     
     def bounds_in_range(self, i, j):
       return i in range(self.num_rows) and j in range(self.num_cols)
@@ -200,25 +209,30 @@ class Minefield():
         case CellState.OPENED:
           if(self.board[i, j].is_mine()):
             return MINE_CHAR
+          elif(self.board[i, j].is_blank()):
+            return BLANK_CHAR
+          else:
+            return str(self.board[i, j].value)
         case _:
           return str(self.board[i, j].value)
 
-    def __str__(self):
+    def print_solution(self):
       rep = "[\n"
       
       # Solution representation.
-      # for i in range(0, self.num_rows):
-      #   rep += "\t["
-      #   for j in range(0, self.num_cols):
-      #     rep += str(self.board[i][j].value).rjust(2, " ")
+      for i in range(0, self.num_rows):
+        rep += "\t["
+        for j in range(0, self.num_cols):
+          rep += str(self.board[i, j].value).rjust(2, " ")
 
-      #     if(j < self.num_cols - 1):
-      #       rep += ", "
+          if(j < self.num_cols - 1):
+            rep += ", "
 
-      #   rep += "]\n"
+        rep += "]\n"
+      return rep
 
-      # rep += "]\n\n"
-      # rep += "[\n"
+    def __str__(self):
+      rep = ""
       
       for i in range(0, self.num_rows):
         rep += "\t["
@@ -229,7 +243,5 @@ class Minefield():
             rep += "|"
 
         rep += "]\n"
-
-      rep += "]"
 
       return rep
