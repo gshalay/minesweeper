@@ -119,14 +119,6 @@ class Minefield():
 
       # Create a mask where CellState is not unopened
       mask = cell_states != CellState.OPENED
-      s = np.sum(mask)
-
-      if(np.sum(mask) == self.num_mines):
-        print(mask)
-        print()
-        print(cell_states)
-        print()
-        print(f"sum: {s}\tmines: {self.num_mines}")
 
       # Count elements that are not unopened
       return (np.sum(mask) == self.num_mines)
@@ -216,7 +208,7 @@ class Minefield():
           return str(self.board[i, j].value)
 
     def print_solution(self):
-      rep = "[\n"
+      rep = ""
       
       # Solution representation.
       for i in range(0, self.num_rows):
