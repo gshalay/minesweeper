@@ -6,11 +6,18 @@ class Window:
         self.root = Tk()
         self.width = width
         self.height = height
-        self.canvas = Canvas(width=width+50, height=height+50)
+        
+        # Info Canvas
+        self.info_canvas = Canvas(width=width, height=300, relief="raised", background="black")
+        
+        # Field Canvas
+        # self.canvas = Canvas(width=width+50, height=height+50)
+        
         self.is_running = False
         self.root.geometry(str(width) + "x" + str(height))
 
-        self.canvas.pack()
+        self.info_canvas.pack()
+        # self.canvas.pack()
         self.root.protocol("WM_DELETE_WINDOW", self.close)
     
     def redraw(self):
