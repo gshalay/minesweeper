@@ -1,23 +1,17 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, Frame
 
 class Window:
     def __init__(self, width, height):
-        self.title = "Maze Solver"
         self.root = Tk()
         self.width = width
         self.height = height
-        
-        # Info Canvas
-        self.info_canvas = Canvas(width=width, height=300, relief="raised", background="black")
-        
-        # Field Canvas
-        # self.canvas = Canvas(width=width+50, height=height+50)
-        
         self.is_running = False
-        self.root.geometry(str(width) + "x" + str(height))
-
-        self.info_canvas.pack()
-        # self.canvas.pack()
+        self.title = "Minesweeper"
+        
+        # Game Window
+        self.root.title(self.title)
+        self.root.config(bg="#dadada")
+        self.root.geometry(str(width + 10) + "x" + str(height + 10))
         self.root.protocol("WM_DELETE_WINDOW", self.close)
     
     def redraw(self):

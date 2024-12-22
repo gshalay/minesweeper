@@ -1,3 +1,6 @@
+## UI Constants
+DIM_ROUND_DIGIT = 8
+
 ## Minefield Constants
 FLAGGED_VAL = -1
 MINE_VAL = -2
