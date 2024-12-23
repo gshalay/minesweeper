@@ -1,6 +1,6 @@
 from minefield import Minefield
 from difficulty import Difficulty
-from window import Window
+from game_window import GameWindow
 from constants import *
 import sys
 import time
@@ -132,9 +132,8 @@ def launch_cli():
         print("KABOOM! Mine triggered! GAME OVER!")
 
 def launch_ui():
-    field_window = Window(800, 800)
-    
-    field = Minefield(Difficulty.EASY)
+    desired_difficulty = Difficulty.EASY
+    field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(desired_difficulty))
 
     field_window.wait_for_close()
     
@@ -143,9 +142,10 @@ if(__name__ == "__main__"):
     if(len(sys.argv) != 2):
         print("Usage: python3 launch.py <mode> (-c for command-line, -u for gui)")
     
-    if(sys.argv[1] == "-c"):
-        print("Launching CLI...")
-        launch_cli()
-    if(sys.argv[1] == "-u"):
-        print("Launching UI...")
-        launch_ui()
+    else:    
+        if(sys.argv[1] == "-c"):
+            print("Launching CLI...")
+            launch_cli()
+        if(sys.argv[1] == "-u"):
+            print("Launching UI...")
+            launch_ui()

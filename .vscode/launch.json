@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "src/launch.py",
             "console": "integratedTerminal",
-            "args": ["-c"]
+            "args": ["-u"]
         }
     ]
 }
