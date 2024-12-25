@@ -4,6 +4,7 @@ from tkinter import Frame, Button
 from constants import *
 import numpy as np
 import os
+
 class GameWindow(Window):
     def __init__(self, width, height, minefield):    
         super().__init__(self.normalize_dim_size(width), self.normalize_dim_size(height))
