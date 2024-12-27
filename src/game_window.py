@@ -67,7 +67,7 @@ class GameWindow(Window):
         # Update the frame dimensions for use later.
         self.redraw()
 
-    def change_image(self, button, new_image):
+    def restyle_image(self, button, new_image, state):
         if new_image is None:
             return
 
@@ -81,7 +81,11 @@ class GameWindow(Window):
 
         # Convert to PhotoImage
         new_image = ImageTk.PhotoImage(resized_image)
-        button.config(image=new_image)
+
+        if(state == CellState.OPENED):
+            button.config(image=new_image, relief="flat", borderwidth=0, bg="white")
+        else:
+            button.config(image=new_image)
         button.image = new_image   
     
     def get_cell_image(self, cell):
@@ -114,7 +118,7 @@ class GameWindow(Window):
     def refresh_board(self):
         for i in range(self.minefield.num_rows):
             for j in range(self.minefield.num_cols):
-                self.change_image(self.buttons[i, j], self.get_cell_image(self.minefield.board[i, j]))
+                self.restyle_image(self.buttons[i, j], self.get_cell_image(self.minefield.board[i, j]), self.minefield.board[i, j].state)
     
     def reveal_cell(self, row, col, isLeftClick=True):
         print(f"click button @ {row}, {col}")
