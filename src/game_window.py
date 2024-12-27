@@ -6,6 +6,7 @@ from cell_state import CellState
 from PIL import Image, ImageTk
 import numpy as np
 import os
+import time
 
 class GameWindow(Window):
     def __init__(self, width, height, minefield):    
@@ -67,8 +68,12 @@ class GameWindow(Window):
         # Update the frame dimensions for use later.
         self.redraw()
 
-    def restyle_image(self, button, new_image, state):
-        if new_image is None:
+    def restyle_image(self, button, new_image, cell):
+        if(new_image == None):
+            if(cell.state == CellState.OPENED):
+                button.config(relief="flat", borderwidth=0, bg="white")
+            else:
+                button.config(image=new_image)
             return
 
         image = Image.open(new_image)
@@ -82,8 +87,11 @@ class GameWindow(Window):
         # Convert to PhotoImage
         new_image = ImageTk.PhotoImage(resized_image)
 
-        if(state == CellState.OPENED):
-            button.config(image=new_image, relief="flat", borderwidth=0, bg="white")
+        if(cell.state == CellState.OPENED):
+            if(cell.value == MINE_VAL):
+                button.config(image=new_image, relief="flat", borderwidth=0, bg="red")
+            else:
+                button.config(image=new_image, relief="flat", borderwidth=0, bg="white")
         else:
             button.config(image=new_image)
         button.image = new_image   
@@ -108,6 +116,8 @@ class GameWindow(Window):
                         return SEVEN_PATH
                     case 8:
                         return EIGHT_PATH
+                    case -2:
+                        return MINE_PATH
                     case _:
                         return None
             case CellState.FLAGGED:
@@ -118,11 +128,9 @@ class GameWindow(Window):
     def refresh_board(self):
         for i in range(self.minefield.num_rows):
             for j in range(self.minefield.num_cols):
-                self.restyle_image(self.buttons[i, j], self.get_cell_image(self.minefield.board[i, j]), self.minefield.board[i, j].state)
+                self.restyle_image(self.buttons[i, j], self.get_cell_image(self.minefield.board[i, j]), self.minefield.board[i, j])
     
     def reveal_cell(self, row, col, isLeftClick=True):
-        print(f"click button @ {row}, {col}")
-        
         match(self.minefield.board[row, col].state):
             case CellState.UNOPENED:
                 if(isLeftClick):
@@ -131,8 +139,13 @@ class GameWindow(Window):
                     self.refresh_board()
                     self.redraw()
                     if(retVal == MINE_VAL):
+                        time.sleep(0.5)
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
-                        self.destroy()
+                        self.root.destroy()
+                    elif(self.minefield.is_solved()):
+                        time.sleep(0.5)
+                        messagebox.showinfo("Winner!", "Minefield Solved! Congrats!")
+                        self.root.destroy()
                 else:
                     retVal = self.minefield.flag_coord(row, col)
                     self.redraw()
@@ -150,6 +163,11 @@ class GameWindow(Window):
                     if(retVal == MINE_VAL):
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
                         self.destroy()
+
+                # Change the image back to none.
+                elif(not isLeftClick):
+                    self.refresh_board()
+                    self.redraw()
                 return
             case _:
                 return
@@ -158,7 +176,7 @@ class GameWindow(Window):
         # Create the button with the resized image
         b = Button(self.field_frame, image=None)
         b.bind("<Button-1>", lambda event: self.reveal_cell(row, col))
-        b.bind("<Button-2>", lambda event: self.reveal_cell(row, col, False))
+        b.bind("<Button-3>", lambda event: self.reveal_cell(row, col, False))
         
         b.image = None  # Keep a reference to prevent garbage collection
         b.grid(row=row, column=col, sticky="nsew")  # Expand to fill the grid cell
