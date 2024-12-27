@@ -1,3 +1,5 @@
+import os
+
 ## UI Constants
 DIM_ROUND_DIGIT = 8
 MAX_WINDOW_WIDTH = 1852
@@ -5,6 +7,24 @@ MAX_WINDOW_HEIGHT = 972
 
 MIN_WINDOW_WIDTH = 600
 MIN_WINDOW_HEIGHT = 600
+
+
+## UI Image Path constants
+PATH_TRUNK = os.path.dirname(__file__)
+
+ZERO_PATH  = os.path.join(PATH_TRUNK, "../assets/0.png")
+ONE_PATH   = os.path.join(PATH_TRUNK, "../assets/1.png")
+TWO_PATH   = os.path.join(PATH_TRUNK, "../assets/2.png")
+THREE_PATH = os.path.join(PATH_TRUNK, "../assets/3.png")
+FOUR_PATH  = os.path.join(PATH_TRUNK, "../assets/4.png")
+FIVE_PATH  = os.path.join(PATH_TRUNK, "../assets/5.png")
+SIX_PATH   = os.path.join(PATH_TRUNK, "../assets/6.png")
+SEVEN_PATH = os.path.join(PATH_TRUNK, "../assets/7.png")
+EIGHT_PATH = os.path.join(PATH_TRUNK, "../assets/8.png")
+
+# BLANK_PATH = os.path.join(PATH_TRUNK, "../assets/blank.png")
+FLAG_PATH  = os.path.join(PATH_TRUNK, "../assets/flag.png")
+MINE_PATH  = os.path.join(PATH_TRUNK, "../assets/mine.png")
 
 ## Minefield Constants
 FLAGGED_VAL = -1

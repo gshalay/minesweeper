@@ -110,6 +110,16 @@ class Minefield():
         return True
       else:
         return False
+      
+    def unflag_coord(self, i, j):
+      if(self.bounds_in_range(i, j) and self.board[i, j].state != CellState.OPENED):
+        if(self.board[i, j].state != CellState.FLAGGED):
+          return False
+
+        self.board[i, j].state = CellState.UNOPENED
+        return True
+      else:
+        return False
 
     def count_unopened_cells(self):
       ((25 < self.board) & (self.board < 100)).sum()
