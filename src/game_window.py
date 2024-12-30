@@ -13,6 +13,7 @@ class GameWindow(Window):
         super().__init__(self.normalize_dim_size(width), self.normalize_dim_size(height))
         self.minefield = minefield
         self.buttons = np.empty((self.minefield.num_rows, self.minefield.num_cols), dtype=object)
+        self.default_btn_bg = None # Set later when creating the board since the color can vary based on system architecture.
         
         if(self.width < MIN_WINDOW_WIDTH):
             self.width = MIN_WINDOW_WIDTH
@@ -73,7 +74,8 @@ class GameWindow(Window):
             if(cell.state == CellState.OPENED):
                 button.config(relief="flat", borderwidth=0, bg="white")
             else:
-                button.config(image=new_image)
+                button.config(image=new_image, bg="#d9d9d9")
+                button.image = new_image
             return
 
         image = Image.open(new_image)
@@ -131,7 +133,9 @@ class GameWindow(Window):
                 self.restyle_image(self.buttons[i, j], self.get_cell_image(self.minefield.board[i, j]), self.minefield.board[i, j])
     
     def reveal_cell(self, row, col, isLeftClick=True):
-        match(self.minefield.board[row, col].state):
+        current_state = self.minefield.board[row, col].state
+        
+        match(current_state):
             case CellState.UNOPENED:
                 if(isLeftClick):
                     retVal = self.minefield.open_coord(row, col)
@@ -187,6 +191,8 @@ class GameWindow(Window):
         for row in range(0, self.minefield.num_rows):
             for col in range(0, self.minefield.num_cols):
                 self.buttons[row, col] = self.create_button(row, col)
+
+        self.default_btn_bg = str(self.buttons[0, 0].cget('background'))
 
         # Configure rows and columns to distribute space evenly
         cell_width = self.field_frame.winfo_width() // self.minefield.num_cols
