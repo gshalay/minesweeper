@@ -58,43 +58,36 @@ class GameWindow(Window):
         self.flag_img = Label(self.info_left_frame)
         self.flag_img.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
-        # Bind the <Configure> event to the info_left_frame
-
         self.root.update_idletasks()
 
         self.flag_lbl_var = StringVar(value=str(self.minefield.flags_placed).zfill(4))
 
-        self.flag_lbl = Label(self.info_left_frame, textvariable=self.flag_lbl_var, font=self.alarm_clock_font, fg="red", anchor="nw")
+        self.flag_lbl = Label(self.info_left_frame, textvariable=self.flag_lbl_var, font=self.technology_bold_font, fg="red", anchor="nw")
         self.flag_lbl.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
-        # self.flag_lbl.grid_propagate(False)
 
         # Timer Frame
         self.info_middle_frame = Frame(self.info_frame, background="blue")
         self.info_middle_frame.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
         self.root.update_idletasks()
 
-        # Number of Mines Frame
-        self.info_right_frame = Frame(self.info_frame, background="green")
+        # Number of Mines Panel
+        self.info_right_frame = Frame(self.info_frame, background="yellow")
         self.info_right_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
-
-        self.info_right_frame.columnconfigure(0, weight=1)
-        self.info_right_frame.columnconfigure(1, weight=1)
-        self.info_right_frame.rowconfigure(0, weight=1)
-        self.root.update_idletasks()
+        self.info_right_frame.grid_columnconfigure(0, weight=90)
+        self.info_right_frame.grid_columnconfigure(1, weight=1)
+        self.info_right_frame.grid_rowconfigure(0, weight=1)
+        self.info_right_frame.grid_propagate(False)
+        self.redraw()
 
         self.mine_img = Label(self.info_right_frame)
         self.mine_img.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
+
         self.root.update_idletasks()
-        mine = self.update_image(MINE_PATH, self.mine_img.winfo_width(), self.mine_img.winfo_height())
-        # Update the label with the resized image
-        self.mine_img.configure(image=mine)
-        self.mine_img.image = mine  # Retain a reference to prevent garbage collection
-        # self.mine_var = StringVar(value=str(self.minefield.num_mines).zfill(4))
 
-        # self.mine_lbl = Label(self.info_right_frame, textvariable=self.mine_var, font=self.alarm_clock_font, fg="red", anchor="nw")
-        # self.mine_lbl.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
-        # self.mine_lbl.grid_propagate(False)
+        self.mine_lbl_var = StringVar(value=str(self.minefield.num_mines).zfill(4))
 
+        self.mine_lbl = Label(self.info_right_frame, textvariable=self.mine_lbl_var, font=self.technology_bold_font, fg="red", anchor="nw")
+        self.mine_lbl.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
 
         self.info_frame.rowconfigure(0, weight=1)
         self.info_frame.columnconfigure(0, weight=1)
@@ -123,23 +116,38 @@ class GameWindow(Window):
         # Update the frame dimensions for use later.
         self.root.update_idletasks()
         self.update_flag_image()
+        self.update_mine_image()
 
     
     def update_flag_image(self):
         # Manually check the size of the left frame
-        frame_width, frame_height = self.info_left_frame.winfo_width(), self.info_left_frame.winfo_height()
+        lbl_width, lbl_height = self.flag_img.winfo_width(), self.flag_img.winfo_height()
 
         # Only update if the size has changed
-        new_size = (frame_width, frame_height)
+        new_size = (lbl_width, lbl_height)
         if new_size != self.last_flag_img_size:
             self.last_flag_img_size = new_size
-            resized_flag = self.update_image(FLAG_PATH, frame_width, frame_height)
+            resized_flag = self.update_image(FLAG_PATH, lbl_width, lbl_height)
             self.flag_img.configure(image=resized_flag)
             self.flag_img.image = resized_flag  # Retain reference to prevent GC
 
         # Schedule the next update (e.g., after 100 milliseconds)
         self.root.after(100, self.update_flag_image)
 
+    def update_mine_image(self):
+        # Manually check the size of the left frame
+        lbl_width, lbl_height = self.mine_img.winfo_width(), self.mine_img.winfo_height()
+
+        # Only update if the size has changed
+        new_size = (lbl_width, lbl_height)
+        if new_size != self.last_flag_img_size:
+            self.last_mine_img_size = new_size
+            resized_mine = self.update_image(MINE_PATH, lbl_width, lbl_height)
+            self.mine_img.configure(image=resized_mine)
+            self.mine_img.image = resized_mine  # Retain reference to prevent GC
+
+        # Schedule the next update (e.g., after 100 milliseconds)
+        self.root.after(100, self.update_mine_image)
 
     def update_image(self, path, h, w):
         label_width, label_height = h, w
@@ -154,25 +162,6 @@ class GameWindow(Window):
 
         except Exception as e:
             print(f"Error resizing flag image: {e}")
-
-    def update_mine_image(self, event):
-        # Get the current dimensions of the label
-        current_width = event.width
-        current_height = event.height
-        
-        # Check if resizing is necessary
-        if hasattr(self, '_mine_image_size') and self._mine_image_size == (current_width, current_height):
-            return  # Skip resizing if dimensions haven't changed
-
-        # Resize and update the image
-        mine_img_content = Image.open(MINE_PATH)
-        resized_img = mine_img_content.resize((current_width, current_height), Image.Resampling.LANCZOS)
-        photo = ImageTk.PhotoImage(resized_img)
-        self.mine_img.configure(image=photo)
-        self.mine_img.image = photo  # Keep reference to avoid garbage collection
-
-        # Store the current size to avoid redundant updates
-        self._mine_image_size = (current_width, current_height)
 
     def restyle_image(self, button, new_image, cell):
         if new_image is None:
