@@ -31,6 +31,7 @@ class Minefield():
       self.num_cols = num_cols
       self.num_rows = num_rows
       self.num_mines = num_mines
+      self.flags_placed = 0
       self.board = self._create_board()
       self.place_mines()
       self.place_adjacencies()
@@ -107,6 +108,7 @@ class Minefield():
           return False
 
         self.board[i, j].state = CellState.FLAGGED
+        self.flags_placed += 1
         return True
       else:
         return False
@@ -117,6 +119,7 @@ class Minefield():
           return False
 
         self.board[i, j].state = CellState.UNOPENED
+        self.flags_placed -= 1
         return True
       else:
         return False
@@ -217,7 +220,7 @@ class Minefield():
         case _:
           return str(self.board[i, j].value)
 
-    def print_solution(self):
+    def get_solution(self):
       rep = ""
       
       # Solution representation.

@@ -25,6 +25,9 @@ EIGHT_PATH = os.path.join(PATH_TRUNK, "../assets/8.png")
 # BLANK_PATH = os.path.join(PATH_TRUNK, "../assets/blank.png")
 FLAG_PATH  = os.path.join(PATH_TRUNK, "../assets/flag.png")
 MINE_PATH  = os.path.join(PATH_TRUNK, "../assets/mine.png")
+FONT_PATH  = os.path.join(PATH_TRUNK, "../assets/alarm_clock.ttf")
+
+TECH_PATH  = os.path.join(PATH_TRUNK, "../assets/Technology-Bold.ttf")
 
 ## Minefield Constants
 FLAGGED_VAL = -1
@@ -61,3 +64,8 @@ HARD_NUM_MINES = 60
 EXP_COLS = 30
 EXP_ROWS = 16
 EXP_NUM_MINES = 99
+
+# Font constants
+FONT_SIZE_SMALL  = 16
+FONT_SIZE_MEDIUM = 25
+FONT_SIZE_LARGE  = 50

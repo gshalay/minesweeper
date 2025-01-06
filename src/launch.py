@@ -133,7 +133,11 @@ def launch_cli():
 
 def launch_ui():
     desired_difficulty = Difficulty.EASY
-    field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(desired_difficulty))
+    minefield = Minefield(desired_difficulty)
+    
+    print(minefield.get_solution())
+
+    field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
 
     field_window.wait_for_close()
     
