@@ -10,7 +10,6 @@ import pyglet
 
 pyglet.font.add_file(TECH_PATH)
 
-
 class GameWindow(Window):
     def __init__(self, width, height, minefield):    
         super().__init__(self.normalize_dim_size(width), self.normalize_dim_size(height))
@@ -254,12 +253,12 @@ class GameWindow(Window):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
-                        self.root.destroy()
+                        self.root.quit()
                     elif(self.minefield.is_solved()):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showinfo("Winner!", "Minefield Solved! Congrats!")
-                        self.root.destroy()
+                        self.root.quit()
                 else:
                     retVal = self.minefield.flag_coord(row, col)
                     self.root.update_idletasks()

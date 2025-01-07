@@ -21,8 +21,6 @@ class Window:
         pyglet.font.add_file(FONT_PATH)
 
         self.technology_bold_font = self.initialize_font(TECH_PATH, FONT_SIZE_LARGE)
-        # self.print_loaded_font_details(self.alarm_clock_font)
-        
     
     def redraw(self):
         self.root.update_idletasks()

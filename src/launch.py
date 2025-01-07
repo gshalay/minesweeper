@@ -1,6 +1,7 @@
 from minefield import Minefield
 from difficulty import Difficulty
 from game_window import GameWindow
+from menu_window import MenuWindow
 from constants import *
 import sys
 import time
@@ -137,9 +138,13 @@ def launch_ui():
     
     print(minefield.get_solution())
 
-    field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
+    menu_window = MenuWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
+    menu_window.wait_for_close()
 
-    field_window.wait_for_close()
+    # field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
+    # field_window.wait_for_close()
+    
+    
     
 
 if(__name__ == "__main__"):
