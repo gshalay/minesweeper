@@ -1,5 +1,5 @@
 import os
-
+import datetime
 ## UI Constants
 DIM_ROUND_DIGIT = 8
 MAX_WINDOW_WIDTH = 1852
@@ -69,3 +69,7 @@ EXP_NUM_MINES = 99
 FONT_SIZE_SMALL  = 16
 FONT_SIZE_MEDIUM = 25
 FONT_SIZE_LARGE  = 50
+
+# Timer constants
+TIME_INIT = int(datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0)).timestamp())
+TIME_INIT_STR = "00:00:00"

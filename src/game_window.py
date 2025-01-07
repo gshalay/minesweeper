@@ -1,9 +1,9 @@
 from window import Window
-# from PIL import Image, ImageTk, ImageDraw, ImageFont
 from tkinter import Frame, Button, messagebox, Label, StringVar, BOTH
 from constants import *
 from cell_state import CellState
 from PIL import Image, ImageTk
+from timer import Timer
 import numpy as np
 import time
 import pyglet
@@ -16,7 +16,7 @@ class GameWindow(Window):
         super().__init__(self.normalize_dim_size(width), self.normalize_dim_size(height))
         self.minefield = minefield
         self.buttons = np.empty((self.minefield.num_rows, self.minefield.num_cols), dtype=object)
-        self.default_btn_bg = None # Set later when creating the board since the color can vary based on system architecture.
+        self.default_btn_bg = None
         self.is_resizing = False
 
         if(self.width < MIN_WINDOW_WIDTH):
@@ -30,24 +30,23 @@ class GameWindow(Window):
             self.height = MAX_WINDOW_HEIGHT
         
         # Track the last size of the flag image to prevent resize loops
-        self.last_flag_img_size = None  # None indicates it's uninitialized
-        self.last_mine_img_size = None  # Same for mine image
+        self.last_flag_img_size = None
+        self.last_mine_img_size = None
         self.is_resizing = False  # Flag to prevent resizing feedback loop
 
         # Configure rows in the root window
-        self.root.rowconfigure(0, weight=2)  # 1/8
-        self.root.rowconfigure(1, weight=14)  # 7/8
-        # self.redraw()
+        self.root.rowconfigure(0, weight=2)
+        self.root.rowconfigure(1, weight=14)
 
         # Menu Frame
         # Num Flags, elapsed time, num mines
-        self.info_frame = Frame(self.root, background="red")
+        self.info_frame = Frame(self.root)
         self.info_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.info_frame.grid_propagate(False)
         self.root.update_idletasks()
 
         # Flags Placed Panel
-        self.info_left_frame = Frame(self.info_frame, background="yellow")
+        self.info_left_frame = Frame(self.info_frame)
         self.info_left_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.info_left_frame.grid_columnconfigure(0, weight=90)
         self.info_left_frame.grid_columnconfigure(1, weight=1)
@@ -66,10 +65,17 @@ class GameWindow(Window):
         self.flag_lbl.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
 
         # Timer Frame
-        self.info_middle_frame = Frame(self.info_frame, background="blue")
+        self.info_middle_frame = Frame(self.info_frame)
         self.info_middle_frame.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
         self.root.update_idletasks()
-
+        
+        self.timer_lbl = Label(self.info_middle_frame, font=self.technology_bold_font, anchor="nw", fg="red")
+        self.timer_lbl.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
+        self.info_middle_frame.grid_columnconfigure(0, weight=1)
+        self.info_middle_frame.grid_rowconfigure(0, weight=1)
+        self.info_middle_frame.grid_propagate(False)
+        self.redraw()
+        
         # Number of Mines Panel
         self.info_right_frame = Frame(self.info_frame, background="yellow")
         self.info_right_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
@@ -90,9 +96,9 @@ class GameWindow(Window):
         self.mine_lbl.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
 
         self.info_frame.rowconfigure(0, weight=1)
-        self.info_frame.columnconfigure(0, weight=1)
-        self.info_frame.columnconfigure(1, weight=1)
-        self.info_frame.columnconfigure(2, weight=1)
+        self.info_frame.columnconfigure(0, weight=4)
+        self.info_frame.columnconfigure(1, weight=5)
+        self.info_frame.columnconfigure(2, weight=4)
 
         # Minefield Frame (7/8 of the height)
         self.field_frame = Frame(self.root, background="blue")
@@ -117,6 +123,9 @@ class GameWindow(Window):
         self.root.update_idletasks()
         self.update_flag_image()
         self.update_mine_image()
+        
+        self.timer = Timer(self.timer_lbl, self)
+        self.timer.start()
 
     
     def update_flag_image(self):
@@ -243,10 +252,12 @@ class GameWindow(Window):
                     self.root.update_idletasks()
                     if(retVal == MINE_VAL):
                         time.sleep(0.5)
+                        self.timer.stop()
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
                         self.root.destroy()
                     elif(self.minefield.is_solved()):
                         time.sleep(0.5)
+                        self.timer.stop()
                         messagebox.showinfo("Winner!", "Minefield Solved! Congrats!")
                         self.root.destroy()
                 else:
