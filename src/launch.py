@@ -133,20 +133,9 @@ def launch_cli():
         print("KABOOM! Mine triggered! GAME OVER!")
 
 def launch_ui():
-    desired_difficulty = Difficulty.EASY
-    minefield = Minefield(desired_difficulty)
-    
-    print(minefield.get_solution())
-
-    menu_window = MenuWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
+    menu_window = MenuWindow(MIN_WINDOW_WIDTH * 1.5, MIN_WINDOW_HEIGHT * 1.5)
     menu_window.wait_for_close()
-
-    # field_window = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, minefield)
-    # field_window.wait_for_close()
     
-    
-    
-
 if(__name__ == "__main__"):
     if(len(sys.argv) != 2):
         print("Usage: python3 launch.py <mode> (-c for command-line, -u for gui)")

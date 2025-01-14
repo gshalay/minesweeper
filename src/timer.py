@@ -27,8 +27,8 @@ class Timer():
             # function in which it is present repeatedly. 
             # Delays by 1000ms=1 seconds and call count again. 
             self.label.after(1000, self.count)  
-            self.counter += 1   
-            self.parent.redraw()
+            self.counter += 1
+            self.parent.update_idletasks()
   
     # start function of the stopwatch 
     def start(self):

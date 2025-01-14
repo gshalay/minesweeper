@@ -14,7 +14,7 @@ class Window:
         # Game Window
         self.root.title(self.title)
         self.root.config(bg="#dadada")
-        self.root.geometry(str(width + 10) + "x" + str(height + 10))
+        self.root.geometry(str(int(width) + 10) + "x" + str(int(height) + 10))
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         pyglet.options['win32_gdi_font'] = True

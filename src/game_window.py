@@ -1,22 +1,31 @@
-from window import Window
-from tkinter import Frame, Button, messagebox, Label, StringVar, BOTH
+from tkinter import Frame, Button, messagebox, Label, StringVar, Toplevel, font, BOTH
 from constants import *
 from cell_state import CellState
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageFont
 from timer import Timer
+
 import numpy as np
 import time
 import pyglet
 
 pyglet.font.add_file(TECH_PATH)
 
-class GameWindow(Window):
-    def __init__(self, width, height, minefield):    
-        super().__init__(self.normalize_dim_size(width), self.normalize_dim_size(height))
+class GameWindow(Toplevel):
+    def __init__(self, width, height, minefield, parent):
+        super().__init__(parent)
+        self.width = width
+        self.height = height
+        self.geometry(f"{width + 10}x{height + 10}")
         self.minefield = minefield
+        self.title("Minesweeper")
         self.buttons = np.empty((self.minefield.num_rows, self.minefield.num_cols), dtype=object)
         self.default_btn_bg = None
         self.is_resizing = False
+        
+        pyglet.options['win32_gdi_font'] = True
+        pyglet.font.add_file(FONT_PATH)
+        self.technology_bold_font = self.initialize_font(TECH_PATH, FONT_SIZE_LARGE)
+        self.protocol("WM_DELETE_WINDOW", self.close)
 
         if(self.width < MIN_WINDOW_WIDTH):
             self.width = MIN_WINDOW_WIDTH
@@ -33,16 +42,16 @@ class GameWindow(Window):
         self.last_mine_img_size = None
         self.is_resizing = False  # Flag to prevent resizing feedback loop
 
-        # Configure rows in the root window
-        self.root.rowconfigure(0, weight=2)
-        self.root.rowconfigure(1, weight=14)
+        # Configure rows in the _root window
+        self.rowconfigure(0, weight=2)
+        self.rowconfigure(1, weight=14)
 
         # Menu Frame
         # Num Flags, elapsed time, num mines
-        self.info_frame = Frame(self.root)
+        self.info_frame = Frame(self)
         self.info_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.info_frame.grid_propagate(False)
-        self.root.update_idletasks()
+        self.update_idletasks()
 
         # Flags Placed Panel
         self.info_left_frame = Frame(self.info_frame)
@@ -51,12 +60,12 @@ class GameWindow(Window):
         self.info_left_frame.grid_columnconfigure(1, weight=1)
         self.info_left_frame.grid_rowconfigure(0, weight=1)
         self.info_left_frame.grid_propagate(False)
-        self.redraw()
+        #self.redraw()
 
         self.flag_img = Label(self.info_left_frame)
         self.flag_img.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
-        self.root.update_idletasks()
+        self.update_idletasks()
 
         self.flag_lbl_var = StringVar(value=str(self.minefield.flags_placed).zfill(4))
 
@@ -66,14 +75,13 @@ class GameWindow(Window):
         # Timer Frame
         self.info_middle_frame = Frame(self.info_frame)
         self.info_middle_frame.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
-        self.root.update_idletasks()
+        self.update_idletasks()
         
         self.timer_lbl = Label(self.info_middle_frame, font=self.technology_bold_font, anchor="nw", fg="red")
         self.timer_lbl.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
         self.info_middle_frame.grid_columnconfigure(0, weight=1)
         self.info_middle_frame.grid_rowconfigure(0, weight=1)
         self.info_middle_frame.grid_propagate(False)
-        self.redraw()
         
         # Number of Mines Panel
         self.info_right_frame = Frame(self.info_frame, background="yellow")
@@ -82,12 +90,11 @@ class GameWindow(Window):
         self.info_right_frame.grid_columnconfigure(1, weight=1)
         self.info_right_frame.grid_rowconfigure(0, weight=1)
         self.info_right_frame.grid_propagate(False)
-        self.redraw()
 
         self.mine_img = Label(self.info_right_frame)
         self.mine_img.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
 
-        self.root.update_idletasks()
+        self.update_idletasks()
 
         self.mine_lbl_var = StringVar(value=str(self.minefield.num_mines).zfill(4))
 
@@ -100,11 +107,11 @@ class GameWindow(Window):
         self.info_frame.columnconfigure(2, weight=4)
 
         # Minefield Frame (7/8 of the height)
-        self.field_frame = Frame(self.root, background="blue")
+        self.field_frame = Frame(self, background="blue")
         self.field_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
         # Ensure the column expands to fill horizontal space
-        self.root.columnconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
         
         self.info_frame.grid_propagate(False)
         self.info_left_frame.grid_propagate(False)
@@ -113,19 +120,21 @@ class GameWindow(Window):
         self.field_frame.grid_propagate(False)
 
         # Update the frame dimensions for use later.
-        self.root.update_idletasks()
+        self.update_idletasks()
 
         # Create Cells
         self._populate_board()
 
         # Update the frame dimensions for use later.
-        self.root.update_idletasks()
+        self.update_idletasks()
         self.update_flag_image()
         self.update_mine_image()
         
         self.timer = Timer(self.timer_lbl, self)
         self.timer.start()
 
+    def close(self):
+        self.destroy()
     
     def update_flag_image(self):
         # Manually check the size of the left frame
@@ -140,7 +149,7 @@ class GameWindow(Window):
             self.flag_img.image = resized_flag  # Retain reference to prevent GC
 
         # Schedule the next update (e.g., after 100 milliseconds)
-        self.root.after(100, self.update_flag_image)
+        self.after(100, self.update_flag_image)
 
     def update_mine_image(self):
         # Manually check the size of the left frame
@@ -155,7 +164,7 @@ class GameWindow(Window):
             self.mine_img.image = resized_mine  # Retain reference to prevent GC
 
         # Schedule the next update (e.g., after 100 milliseconds)
-        self.root.after(100, self.update_mine_image)
+        self.after(100, self.update_mine_image)
 
     def update_image(self, path, h, w):
         label_width, label_height = h, w
@@ -246,24 +255,24 @@ class GameWindow(Window):
             case CellState.UNOPENED:
                 if(isLeftClick):
                     retVal = self.minefield.open_coord(row, col)
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                     self.refresh_board()
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                     if(retVal == MINE_VAL):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
-                        self.root.quit()
+                        self.destroy()
                     elif(self.minefield.is_solved()):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showinfo("Winner!", "Minefield Solved! Congrats!")
-                        self.root.quit()
+                        self.destroy()
                 else:
                     retVal = self.minefield.flag_coord(row, col)
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                     self.refresh_board()
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                 return
             case CellState.OPENED:
                 return
@@ -272,7 +281,7 @@ class GameWindow(Window):
                 if(isLeftClick):
                     retVal = self.minefield.open_coord(row, col)
                     self.refresh_board()
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                     if(retVal == MINE_VAL):
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
                         self.destroy()
@@ -280,7 +289,7 @@ class GameWindow(Window):
                 # Change the image back to none.
                 elif(not isLeftClick):
                     self.refresh_board()
-                    self.root.update_idletasks()
+                    self.update_idletasks()
                 return
             case _:
                 return
@@ -288,6 +297,8 @@ class GameWindow(Window):
     def create_button(self, row, col):
         # Create the button with the resized image
         b = Button(self.field_frame, image=None)
+        # b["row"] = str(row)
+        # b["column"] = str(col)
         b.bind("<Button-1>", lambda event: self.reveal_cell(row, col))
         b.bind("<Button-3>", lambda event: self.reveal_cell(row, col, False))
         
@@ -312,7 +323,7 @@ class GameWindow(Window):
         for col in range(self.minefield.num_cols):
             self.field_frame.columnconfigure(col, weight=1, minsize=cell_width)
         
-        self.root.update_idletasks()
+        self.update_idletasks()
         
     # A good ratio for the two frames is 1/8 and 7/8 of window height respectfully.
     def normalize_dim_size(self, size, factor=None):
@@ -324,3 +335,16 @@ class GameWindow(Window):
             new_size = int((new_size * factor) + (new_size * factor) % DIM_ROUND_DIGIT)
         
         return new_size
+
+    def initialize_font(self, path, font_size):
+        try:
+            # Load the .ttf font using PIL ImageFont
+            pil_font = ImageFont.truetype(path, font_size)
+
+            # Register the font with Tkinter
+            custom_font = font.Font(family=pil_font.getname()[0], size=font_size)
+
+            return custom_font
+        except Exception as e:
+            print(f"Error loading font: {e}")
+            return None
