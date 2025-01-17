@@ -163,6 +163,14 @@ class MenuWindow(Window):
                 self.hide()
                 param_window = ParamWindow(self.root, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
                 self.root.wait_window(param_window)
+
+                
+                # Prints
+                print(f"{param_window.rows}")
+                print(f"{param_window.cols}")
+                print(f"{param_window.mines}")
+
+
                 self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.CUSTOM, param_window.rows, param_window.cols, param_window.mines), self.root)
                 self.game.protocol("WM_DELETE_WINDOW", self.show)
             case _:
