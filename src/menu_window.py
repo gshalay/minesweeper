@@ -29,7 +29,7 @@ class MenuWindow(Window):
             self.height = MAX_WINDOW_HEIGHT
         
         # Title Frame
-        self.title_frame = Frame(self.root, background="red")
+        self.title_frame = Frame(self.root)
         self.title_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.title_frame.rowconfigure(0, weight=1)
         self.title_frame.rowconfigure(1, weight=1)
@@ -44,9 +44,9 @@ class MenuWindow(Window):
         self.hint_lbl["text"] = "Select Difficulty..."
         
         # Easy Option Frame
-        self.easy_frame = Frame(self.root, background="yellow")
+        self.easy_frame = Frame(self.root)
         self.easy_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-        self.easy_frame.rowconfigure(1, weight=1)
+        self.easy_frame.rowconfigure(0, weight=1)
         self.easy_frame.columnconfigure(0, weight=1)
         
         self.easy_lbl = Label(self.easy_frame, font=self.technology_bold_font, anchor="nw")
@@ -62,7 +62,7 @@ class MenuWindow(Window):
         self.redraw()
         
         # Medium Option Frame
-        self.medium_frame = Frame(self.root, background="blue")
+        self.medium_frame = Frame(self.root)
         self.medium_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
         self.medium_frame.rowconfigure(0, weight=1)
         self.medium_frame.columnconfigure(0, weight=1)
@@ -80,7 +80,7 @@ class MenuWindow(Window):
         self.redraw()
         
         # Hard Option Frame
-        self.hard_frame = Frame(self.root, background="green")
+        self.hard_frame = Frame(self.root)
         self.hard_frame.grid(row=3, column=0, padx=5, pady=5, sticky="nsew")
         self.hard_frame.rowconfigure(0, weight=1)
         self.hard_frame.columnconfigure(0, weight=1)
@@ -98,7 +98,7 @@ class MenuWindow(Window):
         self.redraw()
 
         # Expert Option Frame
-        self.expert_frame = Frame(self.root, background="purple")
+        self.expert_frame = Frame(self.root)
         self.expert_frame.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
         self.expert_frame.rowconfigure(0, weight=1)
         self.expert_frame.columnconfigure(0, weight=1)
@@ -116,7 +116,7 @@ class MenuWindow(Window):
         self.redraw()
         
         # Custom Option Frame
-        self.custom_frame = Frame(self.root, background="red")
+        self.custom_frame = Frame(self.root)
         self.custom_frame.grid(row=5, column=0, padx=5, pady=5, sticky="nsew")
         self.custom_frame.rowconfigure(0, weight=1)
         self.custom_frame.columnconfigure(0, weight=1)
@@ -143,6 +143,28 @@ class MenuWindow(Window):
         # Update the frame dimensions for use later.
         self.redraw()
         
+    def remove_bindings(self):
+        self.easy_frame.unbind("<Enter>")
+        self.easy_frame.unbind("<Leave>")
+        self.easy_frame.unbind("<Button-1>")
+        
+        self.medium_frame.unbind("<Enter>")
+        self.medium_frame.unbind("<Leave>")
+        self.medium_frame.unbind("<Button-1>")
+        
+        self.hard_frame.unbind("<Enter>")
+        self.hard_frame.unbind("<Leave>")
+        self.hard_frame.unbind("<Button-1>")
+        
+        self.expert_frame.unbind("<Enter>")
+        self.expert_frame.unbind("<Leave>")
+        self.expert_frame.unbind("<Button-1>")
+        
+        self.custom_frame.unbind("<Enter>")
+        self.custom_frame.unbind("<Leave>")
+        self.custom_frame.unbind("<Button-1>")
+
+    
     def open_game(self, difficulty):
         match(difficulty):
             case Difficulty.EASY:
@@ -161,15 +183,8 @@ class MenuWindow(Window):
                 self.game.protocol("WM_DELETE_WINDOW", self.show)
             case Difficulty.CUSTOM:
                 self.hide()
-                param_window = ParamWindow(self.root, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
+                param_window = ParamWindow(self.root)
                 self.root.wait_window(param_window)
-
-                
-                # Prints
-                print(f"{param_window.rows}")
-                print(f"{param_window.cols}")
-                print(f"{param_window.mines}")
-
 
                 self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.CUSTOM, param_window.rows, param_window.cols, param_window.mines), self.root)
                 self.game.protocol("WM_DELETE_WINDOW", self.show)

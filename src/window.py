@@ -1,4 +1,4 @@
-from tkinter import Tk, font
+from tkinter import Tk, font, PhotoImage
 from PIL import ImageFont
 from constants import *
 import pyglet

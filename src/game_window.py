@@ -4,11 +4,13 @@ from cell_state import CellState
 from PIL import Image, ImageTk, ImageFont
 from timer import Timer
 
+import sys
 import numpy as np
 import time
 import pyglet
 
 pyglet.font.add_file(TECH_PATH)
+sys.setrecursionlimit(2000)
 
 class GameWindow(Toplevel):
     def __init__(self, width, height, minefield, parent):
@@ -60,7 +62,6 @@ class GameWindow(Toplevel):
         self.info_left_frame.grid_columnconfigure(1, weight=1)
         self.info_left_frame.grid_rowconfigure(0, weight=1)
         self.info_left_frame.grid_propagate(False)
-        #self.redraw()
 
         self.flag_img = Label(self.info_left_frame)
         self.flag_img.grid(row=0, column=0, padx=2, pady=2, sticky="nsew")
@@ -84,7 +85,7 @@ class GameWindow(Toplevel):
         self.info_middle_frame.grid_propagate(False)
         
         # Number of Mines Panel
-        self.info_right_frame = Frame(self.info_frame, background="yellow")
+        self.info_right_frame = Frame(self.info_frame)
         self.info_right_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
         self.info_right_frame.grid_columnconfigure(0, weight=90)
         self.info_right_frame.grid_columnconfigure(1, weight=1)
@@ -134,6 +135,7 @@ class GameWindow(Toplevel):
         self.timer.start()
 
     def close(self):
+        self.remove_button_bindings()
         self.destroy()
     
     def update_flag_image(self):
@@ -262,12 +264,12 @@ class GameWindow(Toplevel):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
-                        self.destroy()
+                        self.close()
                     elif(self.minefield.is_solved()):
                         time.sleep(0.5)
                         self.timer.stop()
                         messagebox.showinfo("Winner!", "Minefield Solved! Congrats!")
-                        self.destroy()
+                        self.close()
                 else:
                     retVal = self.minefield.flag_coord(row, col)
                     self.update_idletasks()
@@ -284,7 +286,7 @@ class GameWindow(Toplevel):
                     self.update_idletasks()
                     if(retVal == MINE_VAL):
                         messagebox.showerror("Game Over!", "KABOOM! Game Over!")
-                        self.destroy()
+                        self.close()
 
                 # Change the image back to none.
                 elif(not isLeftClick):
@@ -307,6 +309,11 @@ class GameWindow(Toplevel):
 
         return b
     
+    def remove_button_bindings(self):
+        for b in self.buttons:
+            b.unbind("<Button-1>")
+            b.unbind("<Button-3>")
+            
     def _populate_board(self):
         for row in range(0, self.minefield.num_rows):
             for col in range(0, self.minefield.num_cols):

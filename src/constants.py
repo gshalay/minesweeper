@@ -1,5 +1,6 @@
 import os
 import datetime
+
 ## UI Constants
 DIM_ROUND_DIGIT = 8
 MAX_WINDOW_WIDTH = 1852
@@ -7,7 +8,6 @@ MAX_WINDOW_HEIGHT = 972
 
 MIN_WINDOW_WIDTH = 600
 MIN_WINDOW_HEIGHT = 600
-
 
 ## UI Image Path constants
 PATH_TRUNK = os.path.dirname(__file__)

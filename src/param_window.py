@@ -1,11 +1,11 @@
 from constants import *
-from tkinter import Frame, Label, Entry, Button, Toplevel, font
+from tkinter import Frame, Label, Entry, Button, Toplevel, font, messagebox
 from PIL import ImageFont
 import pyglet
 
 
 class ParamWindow(Toplevel):
-    def __init__(self, parent, width, height):
+    def __init__(self, parent):
         super().__init__(parent)
         self.rows = self.cols = self.mines = self.retval = None
         self.geometry(f"{MIN_WINDOW_WIDTH // 2}x{MIN_WINDOW_HEIGHT // 3}")
@@ -17,7 +17,7 @@ class ParamWindow(Toplevel):
         self.validate_int_input = self.register(self.validate_integer)
 
         # Params Frame
-        self.params_frame = Frame(self, background="red")
+        self.params_frame = Frame(self)
         self.params_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         self.params_frame.rowconfigure(0, weight=1)
         self.params_frame.rowconfigure(1, weight=1)
@@ -30,7 +30,6 @@ class ParamWindow(Toplevel):
         
         self.err_lbl = Label(self.params_frame, font=("Helvetica", 14), fg="red")
         self.err_lbl.grid(row=0, column=0, columnspan=2, padx=2, pady=2, sticky="nsew")
-        self.err_lbl["text"] = "Test"
         
         self.row_lbl = Label(self.params_frame, font=("Helvetica", 14))
         self.row_lbl.grid(row=1, column=0, padx=2, pady=2, sticky="nsew")
@@ -76,14 +75,13 @@ class ParamWindow(Toplevel):
         self.rows = int(self.rows_txt.get())
         self.cols = int(self.cols_txt.get())
         self.mines = int(self.mines_txt.get())
-        self.retval = 0
         
         state = self.is_valid()
-
+        self.err_lbl["text"] = state[0]
+        
         if(state[1]):
+            self.retval = 0
             self.destroy()  # Close the child window
-        else:
-            self.err_lbl["text"] = state[0]
 
     def initialize_font(self, path, font_size):
         try:
@@ -100,4 +98,44 @@ class ParamWindow(Toplevel):
     
     def validate_integer(self, val_to_process):
         return val_to_process.isdigit() or val_to_process == ""
+    
+    def is_valid(self):
+        label_text = ""
+        valid = False
+        
+        if(self.rows and self.cols and self.mines):
+            params_normalized = []
+            
+            if(self.rows < 0):
+                self.rows = self.rows * -1
+            elif(self.rows > MAX_DIM):
+                params_normalized.append("rows")
+                self.rows = MAX_DIM                
+            
+            if(self.cols < 0):
+                self.cols = self.cols * -1
+            elif(self.cols > MAX_DIM):
+                params_normalized.append("cols")
+                self.cols = MAX_DIM
+            
+            if(params_normalized):
+                prefix = "Rows " if(len(params_normalized) == 1) else "Rows and columns "
+                    
+                messagebox.showinfo("Normalized Board Dimensions", prefix + "exceeded the max of 50. Set to 50.")
+            
+            mine_threshold = ((self.rows * self.cols) * MAX_MINE_PERCENTAGE) // 1
+            if(self.rows >= mine_threshold or self.cols >= mine_threshold or self.mines >= mine_threshold):
+                messagebox.showinfo("Mine Amount", "Mine number entered exceeded threshold of " + str(int(mine_threshold)) + ". Mines set to " + str(mine_threshold) + "." )
+            
+            valid = True
+                    
+        else:
+            if(not self.rows):
+                label_text = "Specify number of rows."
+            if(not self.cols):
+                label_text = "Specify number of columns."
+            if(not self.mines):
+                label_text = "Specify number of mines."
+            
+        return (label_text, valid)
             
