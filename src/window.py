@@ -10,12 +10,12 @@ class Window:
         self.height = height
         self.is_running = False
         self.title = "Minesweeper"
-        
+
         # Game Window
         self.root.title(self.title)
         self.root.config(bg="#dadada")
-        self.root.geometry(str(int(width) + 10) + "x" + str(int(height) + 10))
         self.root.protocol("WM_DELETE_WINDOW", self.close)
+        self.root.geometry(f"{int(self.width) + 10}x{int(self.height) + 10}")
 
         pyglet.options['win32_gdi_font'] = True
         pyglet.font.add_file(FONT_PATH)
@@ -25,6 +25,13 @@ class Window:
     def redraw(self):
         self.root.update_idletasks()
         self.root.update()
+
+    def show(self):
+        self.root.deiconify()
+    
+    def hide(self):
+        self.root.withdraw()
+
 
     def wait_for_close(self):
         self.is_running = True

@@ -14,8 +14,9 @@ class MenuWindow(Window):
     def __init__(self, width, height, parent=None):  
         if parent:
             parent.destroy()
-        
+
         super().__init__(width, height)
+        super().hide()
         self.root.title("Minesweeper - Main Menu")
         
         if(self.width < MIN_WINDOW_WIDTH):
@@ -142,6 +143,11 @@ class MenuWindow(Window):
 
         # Update the frame dimensions for use later.
         self.redraw()
+        self.root.update_idletasks()
+        self.center_window()
+        self.root.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
+        
+        super().show()
         
     def remove_bindings(self):
         self.easy_frame.unbind("<Enter>")
@@ -166,6 +172,8 @@ class MenuWindow(Window):
 
     
     def open_game(self, difficulty):
+        self.hide()
+
         match(difficulty):
             case Difficulty.EASY:
                 self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.EASY), self.root)
@@ -182,12 +190,15 @@ class MenuWindow(Window):
                 self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.EXTREME), self.root)
                 self.game.protocol("WM_DELETE_WINDOW", self.show)
             case Difficulty.CUSTOM:
-                self.hide()
                 param_window = ParamWindow(self.root)
                 self.root.wait_window(param_window)
 
-                self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.CUSTOM, param_window.rows, param_window.cols, param_window.mines), self.root)
-                self.game.protocol("WM_DELETE_WINDOW", self.show)
+                if(param_window.state[1]):
+                    self.game = GameWindow(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT, Minefield(Difficulty.CUSTOM, param_window.rows, param_window.cols, param_window.mines), self.root)
+                    self.game.protocol("WM_DELETE_WINDOW", self.show)
+
+                else:
+                    self.show()
             case _:
                 messagebox.showerror("Unknown difficulty.")
                 
@@ -203,9 +214,22 @@ class MenuWindow(Window):
         control["background"] = control.old_colors[0]
         control["foreground"] = control.old_colors[1]
         parent["relief"] = "flat"
+
+    def center_window(self):
+        """Centers the window on the monitor where the mouse is currently located."""
+        self.root.update_idletasks()
+
+        # Get the actual size of the window
+        width = max(self.root.winfo_width(), self.root.winfo_reqwidth(), MIN_WINDOW_WIDTH)
+        height = max(self.root.winfo_height(), self.root.winfo_reqheight(), MIN_WINDOW_HEIGHT)
+
+        # Get the screen dimensions of the monitor where the window is currently located
+        x_pointer, y_pointer = self.root.winfo_pointerxy()
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
         
-    def hide(self):
-        self.root.wm_withdraw()
-    
-    def show(self):
-        self.root.wm_deiconify()
+        # Ensure the window centers correctly on the screen where the pointer is
+        x = max(0, min(x_pointer - width // 2, screen_width - width))
+        y = max(0, min(y_pointer - height // 2, screen_height - height))
+
+        self.root.geometry(f"{width}x{height}+{x}+{y}")

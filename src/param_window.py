@@ -7,6 +7,8 @@ import pyglet
 class ParamWindow(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.hide()    
+        
         self.rows = self.cols = self.mines = self.retval = None
         self.geometry(f"{MIN_WINDOW_WIDTH // 2}x{MIN_WINDOW_HEIGHT // 3}")
         pyglet.options['win32_gdi_font'] = True
@@ -66,6 +68,8 @@ class ParamWindow(Toplevel):
         self.params_frame.grid_propagate(True)
 
         self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.center_window()
+        self.show()
         
     def cancel(self):
         self.retval = 1
@@ -76,12 +80,11 @@ class ParamWindow(Toplevel):
         self.cols = int(self.cols_txt.get())
         self.mines = int(self.mines_txt.get())
         
-        state = self.is_valid()
-        self.err_lbl["text"] = state[0]
+        self.state = self.is_valid()
+        self.err_lbl["text"] = self.state[0]
         
-        if(state[1]):
-            self.retval = 0
-            self.destroy()  # Close the child window
+        if(self.state[1]):
+            self.after(100, self.destroy)
 
     def initialize_font(self, path, font_size):
         try:
@@ -125,7 +128,7 @@ class ParamWindow(Toplevel):
             
             mine_threshold = ((self.rows * self.cols) * MAX_MINE_PERCENTAGE) // 1
             if(self.rows >= mine_threshold or self.cols >= mine_threshold or self.mines >= mine_threshold):
-                messagebox.showinfo("Mine Amount", "Mine number entered exceeded threshold of " + str(int(mine_threshold)) + ". Mines set to " + str(mine_threshold) + "." )
+                messagebox.showinfo("Mine Amount", "Mine number entered exceeded threshold of " + str(int(mine_threshold)) + ". Mines set to " + str(int(mine_threshold)) + "." )
             
             valid = True
                     
@@ -138,4 +141,10 @@ class ParamWindow(Toplevel):
                 label_text = "Specify number of mines."
             
         return (label_text, valid)
+
+    def hide(self):
+        self.withdraw()
+    
+    def show(self):
+        self.deiconify()
             

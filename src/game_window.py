@@ -15,6 +15,8 @@ sys.setrecursionlimit(2000)
 class GameWindow(Toplevel):
     def __init__(self, width, height, minefield, parent):
         super().__init__(parent)
+        
+        self.hide()
         self.width = width
         self.height = height
         self.geometry(f"{width + 10}x{height + 10}")
@@ -108,7 +110,7 @@ class GameWindow(Toplevel):
         self.info_frame.columnconfigure(2, weight=4)
 
         # Minefield Frame (7/8 of the height)
-        self.field_frame = Frame(self, background="blue")
+        self.field_frame = Frame(self)
         self.field_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
         # Ensure the column expands to fill horizontal space
@@ -132,6 +134,9 @@ class GameWindow(Toplevel):
         self.update_mine_image()
         
         self.timer = Timer(self.timer_lbl, self)
+
+        self.show()
+
         self.timer.start()
 
     def close(self):
@@ -299,8 +304,6 @@ class GameWindow(Toplevel):
     def create_button(self, row, col):
         # Create the button with the resized image
         b = Button(self.field_frame, image=None)
-        # b["row"] = str(row)
-        # b["column"] = str(col)
         b.bind("<Button-1>", lambda event: self.reveal_cell(row, col))
         b.bind("<Button-3>", lambda event: self.reveal_cell(row, col, False))
         
@@ -310,9 +313,10 @@ class GameWindow(Toplevel):
         return b
     
     def remove_button_bindings(self):
-        for b in self.buttons:
-            b.unbind("<Button-1>")
-            b.unbind("<Button-3>")
+        for i in range(0, self.minefield.num_rows):        
+            for j in range(0, self.minefield.num_cols):
+                self.buttons[i][j].unbind("<Button-1>")
+                self.buttons[i][j].unbind("<Button-3>")
             
     def _populate_board(self):
         for row in range(0, self.minefield.num_rows):
@@ -355,3 +359,9 @@ class GameWindow(Toplevel):
         except Exception as e:
             print(f"Error loading font: {e}")
             return None
+    
+    def hide(self):
+        self.withdraw()
+    
+    def show(self):
+        self.deiconify()
